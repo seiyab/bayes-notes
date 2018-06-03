@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Gauss Wishart Prior</title>
+    <meta charset="utf-8">
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [['$','$'], ['\\(','\\)']]
+        },
+        TeX: {
+          Macros: {
+            tr: "{\\mathrm{tr}}",
+            bm: ["{\\boldsymbol #1}",1]
+          }
+        }
+      });
+    </script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+  </head>
+  <body>
+    <section>
+      <h1>Likelihood</h1>
+      \begin{align}
+      p \left( \left\{ \bm{x}_{i} \right\} \middle| \bm{\mu}, \Lambda \right)
+      &= \prod_{i=1}^{n}
+         \frac{1}{\left( 2 \pi \right) ^{d/2} } \left| \Lambda \right| ^{\frac{1}{2}}
+         \exp \left(-\frac{1}{2}\left( \bm{\mu} -\bm{x}_{i} \right) ^{T} \Lambda \left( \bm{\mu} - \bm{x}_{i} \right) \right) \\
+      &= \frac{1}{\left( 2 \pi \right) ^{nd/2} } \left| \Lambda \right| ^{\frac{n}{2}}
+         \prod_{i=1}^{n}
+         \exp \left(-\frac{1}{2}\left( \bm{\mu} -\bm{x}_{i} \right) ^{T} \Lambda \left( \bm{\mu} - \bm{x}_{i} \right) \right)
+      \end{align}
+    </section>
+    <section>
+      <h1>Conjugate prior</h1>
+      \begin{align}
+      p \left( \bm{\mu}, \Lambda \right)
+      &= \mathcal{NWi} \left( \bm{\mu}, \Lambda \middle| \bm{\mu}_{0}, \kappa, \nu, T \right) \\
+      &= \mathcal{N}\left( \bm{\mu} \middle| \bm{\mu}_{0}, \left(\kappa \Lambda \right) ^{-1} \right)
+         \mathcal{Wi}\left( \Lambda \middle| T, \nu \right) \\
+      &= \frac{1}{\left( 2\pi \right) ^{\frac{d}{2}} } \left| \kappa \Lambda \right| ^{\frac{1}{2}}
+      \exp \left( -\frac{\kappa}{2} \left( \bm{\mu} - \bm{\mu}_{0}\right)^{T} \Lambda \left( \bm{\mu} - \bm{\mu}_{0}\right) \right)
+      \frac{1}{2^{\frac{nd}{2}}\left| T \right| ^{\frac{1}{2}}\Gamma _{d}\left( \frac{n}{2} \right)}
+      \left| \Lambda \right| ^{\frac{\nu - d -1}{2}} \exp\left( -\frac{1}{2}\tr \left(T^{-1} \Lambda\right)\right) \\
+      &= \frac{1}{Z}\left| \Lambda \right| ^{\frac{1}{2}}
+      \exp \left( \frac{\kappa}{2} \left( \bm{\mu} - \bm{\mu}_{0}\right)^{T} \Lambda \left( \bm{\mu} - \bm{\mu}_{0}\right) \right)
+      \left| \Lambda \right| ^{\frac{\nu - d -1}{2}} \exp\left( -\frac{1}{2}\tr \left(T^{-1} \Lambda\right)\right)
+      \end{align}
+      <p>where $Z = \left( \frac{2\pi}{\kappa}\right) ^{\frac{1}{d}}2^{\frac{nd}{2}}\left| T \right| ^{\frac{1}{2}}\Gamma _{d}\left( \frac{n}{2} \right)$</p>
+    </section>
+    <section>
+      <h1>Posterior</h1>
+      \begin{align}
+      p \left( \mu, \Lambda \middle| \bm{x}_{i} \right)
+      &\propto 
+        \frac{1}{\left( 2 \pi \right) ^{nd/2} } \left| \Lambda \right| ^{\frac{n}{2}}
+        \left( \prod_{i=1}^{n} \exp \left(-\frac{1}{2}\left( \bm{\mu} -\bm{x}_{i} \right) ^{T} \Lambda \left( \bm{\mu} - \bm{x}_{i} \right) \right) \right)
+        \exp \left( -\frac{\kappa}{2} \left( \bm{\mu} - \bm{\mu}_{0}\right)^{T} \Lambda \left( \bm{\mu} - \bm{\mu}_{0}\right) \right)
+        \left| \Lambda \right| ^{\frac{\nu - d -1}{2}} \exp\left( -\frac{1}{2}\tr \left(T^{-1} \Lambda\right)\right) \\
+      &\propto
+        \left( \Lambda \right) ^{\frac{n + \nu - d - 1}{2}}
+        \exp \left( 
+          -\frac{1}{2}\sum _{i=1}^{n} \left( \bm{\mu} - \bm{x}_{i}\right) ^{T} \Lambda \left( \bm{\mu} - \bm{x}_{i}\right)
+          - \frac{\kappa}{2}\left( \bm{\mu} - \bm{\mu}_{0}\right) ^{T} \Lambda \left( \bm{\mu} - \bm{\mu}_{0} \right)
+          - \frac{1}{2}\tr \left( T^{-1}\Lambda \right)
+        \right) \\
+      &=
+        \left( \Lambda \right) ^{\frac{n + \nu - d - 1}{2}}
+        \exp \left( -\frac{1}{2} \left(
+          \sum _{i=1}^{n}\bm{\mu} ^{T}\Lambda \bm{\mu} - 2 \sum_{i=1}^{n}\bm{\mu}^T \Lambda \bm{x}_{i} + \sum_{i=1}^{n}\bm{x}_{i} ^{T} \Lambda \bm{x}_{i}
+           + \kappa \bm{\mu}^{T} \Lambda \bm{\mu} - 2\kappa \bm{\mu}\Lambda\bm{\mu}_{0}  + \kappa\bm{\mu}_{0}^{T}\Lambda\bm{\mu}_{0}
+           + \tr \left( T^{-1}\Lambda \right)
+        \right)\right) \\
+      &=
+        \left( \Lambda \right) ^{\frac{n + \nu - d - 1}{2}}
+        \exp \left( -\frac{1}{2} \left(
+          n\bm{\mu} ^{T}\Lambda \bm{\mu} - 2n \bm{\mu}^T \Lambda \bar{\bm{x}} + \sum_{i=1}^{n}\bm{x}_{i} ^{T} \Lambda \bm{x}_{i}
+           + \kappa \bm{\mu}^{T} \Lambda \bm{\mu} - 2\kappa \bm{\mu}\Lambda\bm{\mu}_{0}  + \kappa\bm{\mu}_{0}^{T}\Lambda\bm{\mu}_{0}
+           + \tr \left( T^{-1}\Lambda \right)
+        \right)\right) \\
+      &=
+        \left( \Lambda \right) ^{\frac{n + \nu - d - 1}{2}}
+        \exp \left( -\frac{1}{2} \left(
+          n\bm{\mu} ^{T}\Lambda \bm{\mu} + \kappa \bm{\mu}^{T} \Lambda \bm{\mu} 
+           - 2n \bm{\mu}^T \Lambda \bar{\bm{x}} - 2\kappa \bm{\mu}\Lambda\bm{\mu}_{0}
+           + \sum_{i=1}^{n}\bm{x}_{i} ^{T} \Lambda \bm{x}_{i} + \kappa\bm{\mu}_{0}^{T}\Lambda\bm{\mu}_{0}
+           + \tr \left( T^{-1}\Lambda \right)
+        \right)\right) \\
+      &=
+        \left( \Lambda \right) ^{\frac{n + \nu - d - 1}{2}}
+        \exp \left( -\frac{1}{2} \left(
+          \left( n + \kappa \right) \bm{\mu}^{T} \Lambda \bm{\mu} 
+           - 2\bm{\mu}^T \Lambda \left( n \bar{\bm{x}} + \kappa \bm{\mu}_{0} \right)
+           + \sum_{i=1}^{n}\bm{x}_{i} ^{T} \Lambda \bm{x}_{i} + \kappa\bm{\mu}_{0}^{T}\Lambda\bm{\mu}_{0}
+           + \tr \left( T^{-1}\Lambda \right)
+        \right)\right) \\
+      &=
+        \left( \Lambda \right) ^{\frac{n + \nu - d - 1}{2}}
+        \exp \left( -\frac{1}{2} \left(
+          \left( n + \kappa \right) \left(
+            \bm{\mu}^{T} \Lambda \bm{\mu} 
+            - 2\bm{\mu}^T \Lambda \left( \frac{n \bar{\bm{x}} + \kappa \bm{\mu}_{0}}{n + \kappa} \right)
+           \right)
+           + \sum_{i=1}^{n}\bm{x}_{i} ^{T} \Lambda \bm{x}_{i} + \kappa\bm{\mu}_{0}^{T}\Lambda\bm{\mu}_{0}
+           + \tr \left( T^{-1}\Lambda \right)
+        \right)\right) \\
+      &=
+        \left( \Lambda \right) ^{\frac{n + \nu - d - 1}{2}}
+        \exp \left( -\frac{1}{2} \left(
+          \left( n + \kappa \right) \left(
+            \bm{\mu}^{T} \Lambda \bm{\mu} 
+            - 2\bm{\mu}^T \Lambda \bm{\mu}_{n}
+            + \bm{\mu}_{n}^{T} \Lambda \bm{\mu}_{n}
+            - \bm{\mu}_{n}^{T} \Lambda \bm{\mu}_{n}
+           \right)
+           + \sum_{i=1}^{n}\bm{x}_{i} ^{T} \Lambda \bm{x}_{i} + \kappa\bm{\mu}_{0}^{T}\Lambda\bm{\mu}_{0}
+           + \tr \left( T^{-1}\Lambda \right)
+        \right)\right) \\
+      &=
+        \left( \Lambda \right) ^{\frac{n + \nu - d - 1}{2}}
+        \exp \left( -\frac{1}{2} \left(
+          \left( n + \kappa \right) \left( \bm{\mu} - \bm{\mu}_{n} \right) ^{T}
+            \Lambda
+            \left( \bm{\mu} - \bm{\mu}_{n} \right)
+           - \left( n + \kappa \right) \bm{\mu}_{n}^{T} \Lambda \bm{\mu}_{n}
+           + \sum_{i=1}^{n}\bm{x}_{i} ^{T} \Lambda \bm{x}_{i} + \kappa\bm{\mu}_{0}^{T}\Lambda\bm{\mu}_{0}
+           + \tr \left( T^{-1}\Lambda \right)
+        \right)\right) \\
+      &=
+        \left( \Lambda \right) ^{\frac{n + \nu - d - 1}{2}}
+        \exp \left( -\frac{1}{2} \left(
+          \left( n + \kappa \right) \left( \bm{\mu} - \bm{\mu}_{n} \right) ^{T}
+            \Lambda
+            \left( \bm{\mu} - \bm{\mu}_{n} \right)
+            + \tr \left(
+              - \left( n + \kappa \right) \bm{\mu}_{n} \bm{\mu}_{n}^{T} \Lambda
+              + \sum_{i=1}^{n}\bm{x}_{i} \bm{x}_{i}^{T} \Lambda + \kappa\bm{\mu}_{0}\bm{\mu}_{0}^{T}\Lambda
+              + T^{-1}\Lambda
+            \right)
+        \right)\right) \\
+      &\propto
+        \mathcal{NWi} \left( \mu, \Lambda \middle| \bm{\mu}_{n}, \kappa_{n}, \nu_{n} , T_{n}  \right)
+      \end{align}
+      where 
+      \begin{align}
+      \bm{\mu}_{n} &= \frac{n \bar{\bm{x}} + \kappa \bm{\mu}_{0}}{n + \kappa} \\
+      \kappa_{n} &= \kappa + n \\
+      \nu_{n} &= \nu + n \\
+      T_{n}^{-1} &= - \left( n + \kappa \right) \bm{\mu}_{n} \bm{\mu}_{n}^{T} + \sum_{i=1}^{n}\bm{x}_{i} \bm{x}_{i}^{T} + \kappa\bm{\mu}_{0}\bm{\mu}_{0}^{T} + T^{-1}\\
+      &= - \left( \frac{1}{n+\kappa} \right) \left( n\bar{\bm{x}} + \kappa\bm{\mu}_{0} \right) \left( n\bar{\bm{x}} + \kappa\bm{\mu}_{0} \right) ^{T} + \sum_{i=1}^{n}\bm{x}_{i} \bm{x}_{i}^{T} + \kappa\bm{\mu}_{0}\bm{\mu}_{0}^{T} + T^{-1}\\
+      &= - \left( \frac{1}{n+\kappa} \right)
+        \left( n^{2}\bar{\bm{x}}\bar{\bm{x}}^{T} + 2n\kappa\bar{\bm{x}}\bm{\mu}_{0} + \kappa^{2}\bm{\mu}_{0}\bm{\mu}_{0}^{T} \right) 
+        + \sum_{i=1}^{n}\bm{x}_{i} \bm{x}_{i}^{T} + \kappa\bm{\mu}_{0}\bm{\mu}_{0}^{T} + T^{-1}\\
+      &= 
+        - \left( \frac{n^{2} + n\kappa -n\kappa}{n+\kappa} \right)\bar{\bm{x}}\bar{\bm{x}}^{T}
+        - 2\left( \frac{n\kappa}{n+\kappa} \right)\bar{\bm{x}}\bm{\mu}_{0}^{T}
+        - \left( \frac{\kappa^{2} + n\kappa - n\kappa}{n+\kappa} \right)\bm{\mu}_{0}\bm{\mu}_{0}^{T}
+        + \sum_{i=1}^{n}\bm{x}_{i} \bm{x}_{i}^{T} + \kappa\bm{\mu}_{0}\bm{\mu}_{0}^{T} + T^{-1}\\
+      &= 
+        - n\bar{\bm{x}}\bar{\bm{x}}^{T}
+        + \left( \frac{n\kappa}{n+\kappa} \right)\bar{\bm{x}}\bar{\bm{x}}^{T}
+        - 2\left( \frac{n\kappa}{n+\kappa} \right)\bar{\bm{x}}\bm{\mu}_{0}^{T}
+        - \kappa\bm{\mu}_{0}\bm{\mu}_{0}^{T}
+        + \left( \frac{n\kappa}{n+\kappa} \right)\bm{\mu}_{0}\bm{\mu}_{0}^{T}
+        + \sum_{i=1}^{n}\bm{x}_{i} \bm{x}_{i}^{T} + \kappa\bm{\mu}_{0}\bm{\mu}_{0}^{T} + T^{-1}\\
+      &=
+        - 2n\bar{\bm{x}}\bar{\bm{x}}^T + n\bar{\bm{x}}\bar{\bm{x}}^T + \sum_{i=1}^{n}\bm{x}_{i} \bm{x}_{i}^{T}
+        + \left( \frac{n\kappa}{n+\kappa} \right)\bar{\bm{x}}\bar{\bm{x}}^{T}
+        - 2\left( \frac{n\kappa}{n+\kappa} \right)\bar{\bm{x}}\bm{\mu}_{0}^{T}
+        + \left( \frac{n\kappa}{n+\kappa} \right)\bm{\mu}_{0}\bm{\mu}_{0}^{T}
+        + T^{-1} \\
+      &=
+        - 2\sum _{i=1}^{n}\bm{x}_{i}\bar{\bm{x}}^{T}
+        + \sum _{i=1}^{n}\bar{\bm{x}}\bar{\bm{x}}^{T}
+        + \sum_{i=1}^{n}\bm{x}_{i} \bm{x}_{i}^{T}
+        + \left( \frac{n\kappa}{n+\kappa} \right)
+          \left( \bar{\bm{x}} - \bm{\mu}_{0} \right)
+          \left( \bar{\bm{x}} - \bm{\mu}_{0} \right) ^{T}
+        + T^{-1} \\
+      &=
+        \sum _{i=1}^{n}\left(\bm{x}_{i} - \bar{\bm{x}} \right)\left(\bm{x}_{i} - \bar{\bm{x}} \right) ^{T}
+        + \left( \frac{n\kappa}{n+\kappa} \right)
+          \left( \bar{\bm{x}} - \bm{\mu}_{0} \right)
+          \left( \bar{\bm{x}} - \bm{\mu}_{0} \right) ^{T}
+        + T^{-1}
+      \end{align}
+    </section>
+  </body>
+</html>
