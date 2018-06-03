@@ -46,7 +46,7 @@
       \exp \left( \frac{\kappa}{2} \left( \bm{\mu} - \bm{\mu}_{0}\right)^{T} \Lambda \left( \bm{\mu} - \bm{\mu}_{0}\right) \right)
       \left| \Lambda \right| ^{\frac{\nu - d -1}{2}} \exp\left( -\frac{1}{2}\tr \left(T^{-1} \Lambda\right)\right)
       \end{align}
-      <p>where $Z = \left( \frac{2\pi}{\kappa}\right) ^{\frac{1}{d}}2^{\frac{nd}{2}}\left| T \right| ^{\frac{1}{2}}\Gamma _{d}\left( \frac{n}{2} \right)$</p>
+      <p>where $Z = \left( \frac{2\pi}{\kappa}\right) ^{\frac{d}{2}}2^{\frac{\nu d}{2}}\left| T \right| ^{\frac{\nu}{2}}\Gamma _{d}\left( \frac{\nu}{2} \right)$</p>
     </section>
     <section>
       <h1>Posterior</h1>
@@ -183,6 +183,146 @@
           \left( \bar{\bm{x}} - \bm{\mu}_{0} \right)
           \left( \bar{\bm{x}} - \bm{\mu}_{0} \right) ^{T}
         + T^{-1}
+      \end{align}
+    </section>
+    <section>
+      <h1>Marginalized predictive</h1>      
+      \begin{align}
+        p\left( \bm{\mu}, \Lambda \middle| \bm{x}_{\mathrm{new}} \right) &= \frac{1}{p\left( \bm{x}_{\mathrm{new}} \right)} p\left(\bm{\mu}, \Lambda, \bm{x}_{\mathrm{new}} \right) \\
+        \mathcal{NWi}\left(
+          \bm{\mu},
+          \Lambda
+          \middle|
+          \bm{\mu}_{1},
+          \kappa + 1,
+          \nu + 1,
+          T_{1}
+        \right)
+        &= \frac{1}{p\left( \bm{x}_{\mathrm{new}}\right)}
+        \mathcal{NWi}\left( \bm{\mu}, \Lambda \middle| \bm{\mu}_{0}, \kappa, \nu, T \right)
+        \mathcal{N}\left( \bm{x}_{\mathrm{new}} \middle| \bm{\mu}, \Lambda \right)
+      \end{align}
+      where
+      \begin{align}
+        \bm{\mu}_{1} &= \frac{\bm{x}_{\mathrm{new}} + \kappa \bm{\mu}}{1 + \kappa}\\
+        T_{1} &= \left( \frac{\kappa}{1 + \kappa}\left( \bm{x} - \bm{\mu}_{0}\right) \left( \bm{x} - \bm{\mu}_{0}\right) ^{T} + T^{-1} \right) ^{-1}
+      \end{align}
+      Hence
+      \begin{align}
+        p\left( \bm{x}_{\mathrm{new}} \right)
+        &= 
+          \frac{
+            \mathcal{NWi}\left( \bm{\mu}, \Lambda \middle| \bm{\mu}_{0}, \kappa, \nu, T \right)
+            \mathcal{N}\left( \bm{x}_{\mathrm{new}} \middle| \bm{\mu}, \kappa\Lambda \right)
+          }{
+            \mathcal{NWi}\left(
+              \bm{\mu},
+              \Lambda
+              \middle|
+              \bm{\mu}_{1},
+              \kappa + 1,
+              \nu + 1,
+              T_{1}
+            \right)
+          } \\
+        &=
+          \frac{Z_{1}}{Z\left(2\pi\right)^{d/2}} \\
+        &=
+          \frac{
+            \left( \frac{2\pi}{\kappa + 1}\right) ^{\frac{d}{2}}2^{\frac{\left( \nu +1 \right) d}{2}}
+            \left| T_{1} \right| ^{\frac{\nu + 1}{2}}
+            \Gamma _{d}\left( \frac{\nu + 1}{2} \right)
+          }{
+            \left( \frac{2\pi}{\kappa}\right) ^{\frac{d}{2}}2^{\frac{\nu d}{2}}
+            \left| T \right| ^{\frac{\nu}{2}}
+            \Gamma _{d}\left( \frac{\nu}{2} \right)
+            \left(2\pi\right)^{d/2}
+          }\\
+        &=
+          \frac{
+            \kappa ^{d/2} \Gamma _{d}\left( \frac{\nu + 1}{2} \right)
+          }{
+            \left( \kappa + 1\right) ^{d/2} \left| T \right| ^{\frac{\nu}{2}} \Gamma_{d}\left( \frac{\nu}{2}\right) \pi^{d/2}
+          }
+          \left| \frac{\kappa}{1 + \kappa}\left( \bm{x} - \bm{\mu}_{0}\right) \left( \bm{x} - \bm{\mu}_{0}\right) ^{T} + T^{-1} \right| ^{-\left( \nu + 1 \right) /2} \\
+        &=
+          \frac{
+            \kappa ^{d/2}
+            \pi ^{d\left( d-1\right) /4} \displaystyle \prod _{i=1}^{d}\Gamma\left( \frac{\nu + 1}{2} + \frac{\left( 1-i \right)}{2}\right)
+          }{
+            \left( \kappa + 1\right) ^{d/2} \left| T \right| ^{\frac{\nu}{2}} \pi^{d/2}
+            \pi ^{d\left( d-1\right) /4} \displaystyle \prod _{i=1}^{d}\Gamma\left( \frac{\nu}{2} + \frac{\left( 1-i \right)}{2}\right)
+          }
+          \left| T^{-1} \right| ^{-\left( \nu + 1 \right) /2}
+          \left|
+            \frac{\kappa}{1 + \kappa}\left( \bm{x} - \bm{\mu}_{0}\right) \left( \bm{x} - \bm{\mu}_{0}\right) ^{T}T + E
+          \right|^{-\left( \nu + 1\right) /2}\\
+        &=
+          \frac{
+            \kappa ^{d/2}
+            \left| T \right| ^{1/2}
+            \displaystyle \prod _{i=1}^{d}\Gamma\left( \frac{\nu}{2} + \frac{\left( 1- \left(i -1 \right) \right)}{2}\right)
+          }{
+            \left( \kappa + 1\right) ^{d/2} \pi^{d/2}
+            \displaystyle \prod _{i=1}^{d}\Gamma\left( \frac{\nu}{2} + \frac{\left( 1-i \right)}{2}\right)
+          }
+          \left(
+            \frac{\kappa}{1 + \kappa} \left( \bm{x} - \bm{\mu}_{0}\right) ^{T}T\left( \bm{x} - \bm{\mu}_{0}\right) + 1
+          \right)^{-\left( \nu = 1 \right) /2}\\
+        &=
+          \frac{
+            \left| \frac{\kappa}{\kappa + 1}T \right| ^{1/2}
+            \displaystyle \prod _{i=0}^{d-1}\Gamma\left( \frac{\nu}{2} + \frac{\left( 1- i \right)}{2}\right)
+          }{
+            \pi^{d/2}
+            \displaystyle \prod _{i=1}^{d}\Gamma\left( \frac{\nu}{2} + \frac{\left( 1-i \right)}{2}\right)
+          }
+          \left(
+            \left( \bm{x} - \bm{\mu}_{0}\right) ^{T} \frac{\kappa}{1 + \kappa} T\left( \bm{x} - \bm{\mu}_{0}\right) + 1
+          \right)^{-\left( \nu + 1 \right) /2}\\
+        &=
+          \frac{
+            \left| \frac{\kappa}{\kappa + 1}T \right| ^{1/2}
+            \Gamma\left( \frac{\nu + 1}{2}\right)
+          }{
+            \pi^{d/2}
+            \Gamma\left( \frac{\nu - d + 1}{2}\right)
+          }
+          \left(
+            \left( \bm{x} - \bm{\mu}_{0}\right) ^{T} \left( \frac{\kappa}{1 + \kappa} T\right) \left( \bm{x} - \bm{\mu}_{0}\right) + 1
+          \right)^{-\left( \nu + 1 \right) /2}\\
+        &=
+          \frac{
+            \Gamma\left( \frac{\nu_{t} + d}{2}\right)
+          }{
+            \pi^{d/2}
+            \left| \frac{\kappa}{\kappa + 1}T \right| ^{-1/2}
+            \Gamma\left( \frac{\nu_{t}}{2}\right)
+          }
+          \left(
+            \left( \bm{x} - \bm{\mu}_{0}\right) ^{T} \left( \frac{\kappa}{1 + \kappa} T\right) \left( \bm{x} - \bm{\mu}_{0}\right) + 1
+          \right)^{-\left(\nu_{t} + d \right)/2}\\
+        &=
+          \frac{
+            \Gamma\left( \frac{\nu_{t} + d}{2}\right)
+          }{
+            \pi^{d/2}
+            \nu _{t} ^{d/2}
+            \left| \frac{\nu_{t}\kappa}{\kappa + 1}T \right| ^{-1/2}
+            \Gamma\left( \frac{\nu_{t}}{2}\right)
+          }
+          \left(
+            \frac{1}{\nu_{t}}\left( \bm{x} - \bm{\mu}_{0}\right) ^{T} \left( \frac{\nu_{t}\kappa}{1 + \kappa} T\right) \left( \bm{x} - \bm{\mu}_{0}\right) + 1
+          \right)^{-\left(\nu_{t} + d \right)/2}\\
+        &=
+          t _{\nu_{t}}\left(
+            \bm{\mu}_{0}, \Sigma
+          \right)
+      \end{align}
+      where
+      \begin{align}
+        \nu_{t} &= \nu - d + 1\\
+        \Sigma &= \frac{1 + \kappa}{\nu_{t}\kappa}T^{-1}
       \end{align}
     </section>
   </body>
